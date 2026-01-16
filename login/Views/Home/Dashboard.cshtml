@@ -1,0 +1,373 @@
+﻿@{
+    ViewData["Title"] = "Dashboard";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .dashboard-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            padding: 20px 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #667eea;
+            font-size: 32px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .user-name {
+            font-size: 18px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .logout-btn {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a6f);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .logout-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(255, 107, 107, 0.4);
+        }
+
+        .status-panel {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            margin-bottom: 30px;
+        }
+
+        .session-timer {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .timer {
+            font-size: 80px;
+            font-weight: bold;
+            color: #667eea;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+        }
+
+        .timer.warning {
+            color: #ffa500;
+            animation: pulse 1s infinite;
+        }
+
+        .timer.danger {
+            color: #ff6b6b;
+            animation: pulse 0.5s infinite;
+        }
+        .status-message {
+            font-size: 20px;
+            color: #666;
+            margin: 15px 0;
+            font-weight: 600;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .status-active {
+            background: #28a745;
+            box-shadow: 0 0 10px #28a745;
+        }
+
+        .status-warning {
+            background: #ffa500;
+            box-shadow: 0 0 10px #ffa500;
+        }
+
+        .status-danger {
+            background: #ff6b6b;
+            box-shadow: 0 0 10px #ff6b6b;
+        }
+
+        .info-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .info-card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s;
+        }
+
+        .info-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .info-card h3 {
+            color: #667eea;
+            font-size: 22px;
+            margin-bottom: 15px;
+        }
+
+        .info-card p {
+            color: #666;
+            line-height: 1.8;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            animation: fadeIn 0.3s;
+        }
+
+
+        .modal-content {
+            background: white;
+            margin: 10% auto;
+            padding: 40px;
+            border-radius: 15px;
+            max-width: 500px;
+            text-align: center;
+            animation: slideDown 0.3s;
+        }
+
+
+        .modal h2 {
+            color: #ff6b6b;
+            font-size: 36px;
+            margin-bottom: 20px;
+        }
+
+        .modal p {
+            font-size: 18px;
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .modal button {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .modal button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🏠 Dashboard</h1>
+            <div class="user-info">
+                <span class="user-name">👤 @ViewBag.Username</span>
+                <form asp-action="Logout" asp-controller="Auth" method="post" style="margin: 0;">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="logout-btn">Chiqish</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Session Status -->
+        <div class="status-panel">
+            <h2 style="color: #667eea; margin-bottom: 20px; text-align: center;">⏰ Session Status</h2>
+            <div class="session-timer">
+                <div class="status-message">
+                    <span id="statusIndicator" class="status-indicator status-active"></span>
+                    <span id="statusText">Session faol</span>
+                </div>
+                <div id="timer" class="timer">15:00</div>
+                <p style="color: #999; font-size: 16px;">Session tugashiga qolgan vaqt</p>
+            </div>
+        </div>
+
+        <!-- Info Cards -->
+        <div class="info-cards">
+            <div class="info-card">
+                <h3>🔐 Access Token</h3>
+                <p>Qisqa muddatli token (15 daqiqa)</p>
+                <p style="margin-top: 15px; color: #28a745; font-weight: bold;">✅ Aktiv</p>
+            </div>
+
+            <div class="info-card">
+                <h3>🔄 Refresh Token</h3>
+                <p>Uzun muddatli token (7 kun)</p>
+                <p style="margin-top: 15px; color: #28a745; font-weight: bold;">✅ Saqlangan</p>
+            </div>
+
+            <div class="info-card">
+                <h3>🛡️ Security</h3>
+                <p>
+                    <strong>HTTPS:</strong> ✅ Enabled<br>
+                    <strong>CSRF:</strong> ✅ Protected<br>
+                    <strong>XSS:</strong> ✅ Protected
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Session Expired Modal -->
+    <div id="expiredModal" class="modal">
+        <div class="modal-content">
+            <h2>⏰ Session Tugadi</h2>
+            <p>Sizning sessioningiz tugadi. Iltimos, qayta login qiling.</p>
+            <button onclick="window.location.href='/Auth/Login'">Login sahifasiga o'tish</button>
+        </div>
+    </div>
+
+    <!-- Warning Modal -->
+    <div id="warningModal" class="modal">
+        <div class="modal-content">
+            <h2>⚠️ Ogohlantirish</h2>
+            <p>Sizning sessioningiz 2 daqiqada tugaydi. Davom etishni xohlaysizmi?</p>
+            <button onclick="refreshSession()">Ha, davom etaman</button>
+        </div>
+    </div>
+
+    <script>
+        let timeLeft = 15 * 60; // 15 daqiqa (sekundlarda)
+        let timerInterval;
+        let warningShown = false;
+
+        function updateTimer() {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            const timerElement = document.getElementById('timer');
+            const statusText = document.getElementById('statusText');
+            const indicator = document.getElementById('statusIndicator');
+
+            timerElement.textContent =
+                `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+            if (timeLeft <= 60) { // 1 daqiqa
+                timerElement.className = 'timer danger';
+                statusText.textContent = '🔴 Session tugayapti!';
+                indicator.className = 'status-indicator status-danger';
+            } else if (timeLeft <= 300) { // 5 daqiqa
+                timerElement.className = 'timer warning';
+                statusText.textContent = '⚠️ Session tez orada tugaydi';
+                indicator.className = 'status-indicator status-warning';
+
+                if (timeLeft === 120 && !warningShown) { // 2 daqiqa
+                    warningShown = true;
+                    document.getElementById('warningModal').style.display = 'block';
+                }
+            } else {
+                timerElement.className = 'timer';
+                statusText.textContent = '✅ Session faol';
+                indicator.className = 'status-indicator status-active';
+            }
+
+            if (timeLeft <= 0) {
+                clearInterval(timerInterval);
+                showExpiredModal();
+            }
+
+            timeLeft--;
+        }
+
+        function showExpiredModal() {
+            document.getElementById('expiredModal').style.display = 'block';
+            setTimeout(() => {
+                window.location.href = '/Auth/Logout';
+            }, 5000);
+        }
+
+        async function refreshSession() {
+            try {
+                const response = await fetch('/Auth/RefreshToken', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    timeLeft = 15 * 60;
+                    warningShown = false;
+                    document.getElementById('warningModal').style.display = 'none';
+                    alert('✅ Session muvaffaqiyatli yangilandi!');
+                } else {
+                    throw new Error('Token yangilash xatosi');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showExpiredModal();
+            }
+        }
+
+        // Timer ni boshlash
+        timerInterval = setInterval(updateTimer, 1000);
+        updateTimer();
+
+        // Avtomatik refresh (background, 10 daqiqada)
+        setTimeout(async () => {
+            await refreshSession();
+        }, 10 * 60 * 1000);
+    </script>
+</body>
+</html>
