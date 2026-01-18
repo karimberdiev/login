@@ -1,4 +1,4 @@
-﻿@{
+@{
     ViewData["Title"] = "Dashboard";
     Layout = null;
 }
@@ -103,6 +103,18 @@
             color: #ff6b6b;
             animation: pulse 0.5s infinite;
         }
+
+        @@keyframes pulse {
+            0%, 100% { 
+                opacity: 1; 
+                transform: scale(1); 
+            }
+            50% { 
+                opacity: 0.7; 
+                transform: scale(1.05); 
+            }
+        }
+
         .status-message {
             font-size: 20px;
             color: #666;
@@ -175,6 +187,10 @@
             animation: fadeIn 0.3s;
         }
 
+        @@keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
 
         .modal-content {
             background: white;
@@ -186,6 +202,16 @@
             animation: slideDown 0.3s;
         }
 
+        @@keyframes slideDown {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
 
         .modal h2 {
             color: #ff6b6b;
@@ -216,6 +242,16 @@
             box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
         }
 
+        @@media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .timer {
+                font-size: 60px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -261,11 +297,9 @@
 
             <div class="info-card">
                 <h3>🛡️ Security</h3>
-                <p>
-                    <strong>HTTPS:</strong> ✅ Enabled<br>
-                    <strong>CSRF:</strong> ✅ Protected<br>
-                    <strong>XSS:</strong> ✅ Protected
-                </p>
+                <p><strong>HTTPS:</strong> ✅ Enabled<br>
+                <strong>CSRF:</strong> ✅ Protected<br>
+                <strong>XSS:</strong> ✅ Protected</p>
             </div>
         </div>
     </div>
@@ -300,7 +334,7 @@
             const statusText = document.getElementById('statusText');
             const indicator = document.getElementById('statusIndicator');
 
-            timerElement.textContent =
+            timerElement.textContent = 
                 `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 
             if (timeLeft <= 60) { // 1 daqiqa
@@ -311,7 +345,7 @@
                 timerElement.className = 'timer warning';
                 statusText.textContent = '⚠️ Session tez orada tugaydi';
                 indicator.className = 'status-indicator status-warning';
-
+                
                 if (timeLeft === 120 && !warningShown) { // 2 daqiqa
                     warningShown = true;
                     document.getElementById('warningModal').style.display = 'block';

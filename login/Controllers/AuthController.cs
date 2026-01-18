@@ -1,6 +1,7 @@
 ﻿using login.Data;
 using login.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -15,6 +16,49 @@ namespace login.Controllers
         {
             _context = context;
             _configuration = configuration;
+        }
+        [HttpGet]
+        public IActionResult Register()
+        {
+            if (User.Identity.IsAuthenticated)
+            {
+                return RedirectToAction("Dashboard", "Home");
+            }
+            return View();
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Register(RegisterModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+            if(await _context.Users.AnyAsync(u => u.Username == model.Username))
+            {
+                ModelState.AddModelError("Username", "Bu foydalanuvchi nomi allaqachon mavjud");
+                return View(model);
+            }
+            if (await _context.Users.AnyAsync(u => u.Email == model.Email))
+            {
+                ModelState.AddModelError("Email", "Bu email allaqachon mavjud");
+                return View(model);
+            }
+            User user = new User
+            {
+                Username = model.Username,
+                Email = model.Email,
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword(model.Password),
+                Role = "User",
+                IsEmailConfirmed = false,
+                CreatedAt = DateTime.UtcNow,
+                IsActive = true
+            };
+            _context.Users.Add(user);
+            await _context.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = "Ro'yxatdan o'tish muvaffaqiyatli amalga oshirildi. Iltimos, tizimga kiring.";
+            return RedirectToAction("Login", "Auth");
         }
         [HttpGet]
         public IActionResult Login()
@@ -32,17 +76,25 @@ namespace login.Controllers
             if(!ModelState.IsValid) {
                 return View(model);
             }
-            if(model.Username == "admin" && model.Password == "admin123")
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == model.Username);
+            if (user == null || !BCrypt.Net.BCrypt.Verify(model.Password, user.PasswordHash))
             {
-                var accessToken = GenerateAccessToken(model.Username);
-                var refreshToken = GenerateRefreshToken();
-                await SaveRefreshToken(model.Username, refreshToken);
-                SetTokenCookies("AccessToken", accessToken, 15);
-                SetTokenCookies("RefreshToken", refreshToken, 7 * 24 * 60);
-                return RedirectToAction("Dashboard", "Home");
+                ModelState.AddModelError(string.Empty, "Noto'g'ri foydalanuvchi nomi yoki parol");
+                return View(model);
             }
-            ModelState.AddModelError("", "Login yoki parol xato!!");
-            return View(model);
+            if(!user.IsActive)
+            {
+                ModelState.AddModelError(string.Empty, "Foydalanuvchi hisobingiz faol emas. Iltimos, administrator bilan bog'laning.");
+                return View(model);
+            }
+            user.LastLoginAt = DateTime.UtcNow;
+            await _context.SaveChangesAsync();
+            var accessToken = GenerateAccessToken(user.Username, user.Role);
+            var refreshToken = GenerateRefreshToken();
+            await SaveRefreshToken(user.Username, refreshToken);
+            SetTokenCookies("AccessToken", accessToken, 1);
+            SetTokenCookies("RefreshToken", refreshToken, 7 * 24 * 60);
+            return RedirectToAction("Dashboard", "Home");
 
         }
         [HttpPost]
@@ -58,13 +110,18 @@ namespace login.Controllers
             {
                 return Unauthorized(new { message = "Noto'g'ri yoki muddati o'tgan refresh token" });
             }
-            var newAccessToken = GenerateAccessToken(storedToken.UserId);
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == storedToken.UserId);
+            if (user == null || !user.IsActive)
+            {
+                return Unauthorized(new { message = "Foydalanuvchi topilmadi yoki faol emas" });
+            }
+            var newAccessToken = GenerateAccessToken(storedToken.UserId, user.Role);
             var newRefreshToken = GenerateRefreshToken();
             storedToken.RevokedAt = DateTime.UtcNow;
             storedToken.ReplacedByToken = newRefreshToken;
             await SaveRefreshToken(storedToken.UserId, newRefreshToken);
             await _context.SaveChangesAsync();
-            SetTokenCookies("AccessToken", newAccessToken, 15);
+            SetTokenCookies("AccessToken", newAccessToken, 1);
             SetTokenCookies("RefreshToken", newRefreshToken, 7 * 24 * 60);
             return Ok(new { message = "Tokenlar muvaffaqiyatli yangilandi" });
         }
@@ -84,7 +141,7 @@ namespace login.Controllers
             Response.Cookies.Delete("RefreshToken");
             return RedirectToAction("Login", "Auth");
         }
-        private string GenerateAccessToken(string username)
+        private string GenerateAccessToken(string username, string role)
         {
             var securityKey = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
@@ -92,7 +149,7 @@ namespace login.Controllers
             {
                 new Claim(ClaimTypes.NameIdentifier, username),
                 new Claim(ClaimTypes.Name, username),
-                new Claim(ClaimTypes.Role, "User"),
+                new Claim(ClaimTypes.Role, role),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
             var token = new JwtSecurityToken(
