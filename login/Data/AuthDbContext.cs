@@ -45,12 +45,24 @@ namespace login.Data
             // Birinchi Admin foydalanuvchini qo'lda qo'shish
             modelBuilder.Entity<User>().HasData(
                 new User
-                { 
+                {
                     Id = 1,
                     Username = "admin",
                     Email = "Admin@gmail.com",
                     PasswordHash = BCrypt.Net.BCrypt.HashPassword("Admin123!"),
                     Role = "Admin",
+                    IsEmailConfirmed = true,
+                    CreatedAt = DateTime.UtcNow,
+                    IsActive = true
+                });
+            modelBuilder.Entity<User>().HasData(
+                new User
+                {
+                    Id = 2,
+                    Username = "odam",
+                    Email = "odam@gmail.com",
+                    PasswordHash = BCrypt.Net.BCrypt.HashPassword("123456"),
+                    Role = "User",
                     IsEmailConfirmed = true,
                     CreatedAt = DateTime.UtcNow,
                     IsActive = true

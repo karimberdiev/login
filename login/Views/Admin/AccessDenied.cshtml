@@ -1,0 +1,114 @@
+﻿@{
+    ViewData["Title"] = "Kirish Taqiqlangan";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .error-container {
+            background: white;
+            padding: 60px 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+        }
+
+        .error-icon {
+            font-size: 100px;
+            margin-bottom: 20px;
+            animation: shake 0.5s;
+        }
+
+        @@keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        .error-container h1 {
+            color: #dc3545;
+            font-size: 36px;
+            margin-bottom: 15px;
+        }
+
+        .error-container p {
+            color: #666;
+            font-size: 18px;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .error-details {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+
+        .error-details p {
+            margin: 10px 0;
+            font-size: 14px;
+        }
+
+        .error-details strong {
+            color: #333;
+        }
+
+        .btn-home {
+            display: inline-block;
+            padding: 15px 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-home:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <div class="error-container">
+        <div class="error-icon">🚫</div>
+        <h1>Kirish Taqiqlangan</h1>
+        <p>Kechirasiz, sizda bu sahifaga kirish huquqi yo'q.</p>
+
+        <div class="error-details">
+            <p><strong>Sabab:</strong> Bu sahifa faqat Adminlar uchun</p>
+            <p><strong>Sizning rolingiz:</strong> @User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value</p>
+            <p><strong>Username:</strong> @User.Identity?.Name</p>
+        </div>
+
+        <a href="@Url.Action("Dashboard", "Home")" class="btn-home">
+            🏠 Bosh Sahifaga Qaytish
+        </a>
+    </div>
+</body>
+</html>
