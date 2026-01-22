@@ -1,0 +1,336 @@
+﻿@model login.Models.User
+@{
+    ViewData["Title"] = "Profil";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="profile-container">
+    <div class="page-header">
+        <h1>👤 Mening Profilim</h1>
+        <p>Shaxsiy ma'lumotlaringizni ko'ring va boshqaring</p>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">
+            ✅ @TempData["SuccessMessage"]
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">
+            ❌ @TempData["ErrorMessage"]
+        </div>
+    }
+
+    <!-- Profile Card -->
+    <div class="profile-card">
+        <div class="profile-avatar">
+            <div class="avatar-circle">
+                @{
+                    var initial = Model.Username.Substring(0, 1).ToUpper();
+                }
+                <span>@initial</span>
+            </div>
+            <div class="role-badge @(Model.Role == "Admin" ? "admin" : "user")">
+                @if (Model.Role == "Admin")
+                {
+                    <span>👑 @Model.Role</span>
+                }
+                else
+                {
+                    <span>👤 @Model.Role</span>
+                }
+            </div>
+        </div>
+
+        <div class="profile-info">
+            <div class="info-row">
+                <span class="label">🔤 Username:</span>
+                <span class="value">@Model.Username</span>
+            </div>
+            <div class="info-row">
+                <span class="label">📧 Email:</span>
+                <span class="value">@Model.Email</span>
+            </div>
+            <div class="info-row">
+                <span class="label">📅 Ro'yxatdan O'tgan:</span>
+                <span class="value">@Model.CreatedAt.ToString("dd.MM.yyyy HH:mm")</span>
+            </div>
+            <div class="info-row">
+                <span class="label">🕐 Oxirgi Kirish:</span>
+                <span class="value">
+                    @if (Model.LastLoginAt.HasValue)
+                    {
+                        @Model.LastLoginAt.Value.ToString("dd.MM.yyyy HH:mm")
+                    }
+                    else
+                    {
+                        <span class="text-muted">Hech qachon</span>
+                    }
+                </span>
+            </div>
+            <div class="info-row">
+                <span class="label">✅ Status:</span>
+                <span class="value">
+                    @if (Model.IsActive)
+                    {
+                        <span class="badge badge-success">Faol</span>
+                    }
+                    else
+                    {
+                        <span class="badge badge-danger">Bloklangan</span>
+                    }
+                </span>
+            </div>
+            <div class="info-row">
+                <span class="label">📧 Email Tasdiqlangan:</span>
+                <span class="value">
+                    @if (Model.IsEmailConfirmed)
+                    {
+                        <span class="badge badge-success">Ha</span>
+                    }
+                    else
+                    {
+                        <span class="badge badge-warning">Yo'q</span>
+                    }
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="action-cards">
+        <a asp-action="Edit" class="action-card primary">
+            <div class="card-icon">✏️</div>
+            <div class="card-content">
+                <h3>Profilni Tahrirlash</h3>
+                <p>Email va boshqa ma'lumotlarni o'zgartirish</p>
+            </div>
+        </a>
+
+        <a asp-action="ChangePassword" class="action-card warning">
+            <div class="card-icon">🔒</div>
+            <div class="card-content">
+                <h3>Parolni O'zgartirish</h3>
+                <p>Yangi parol o'rnatish</p>
+            </div>
+        </a>
+
+        <a asp-action="DeleteAccount" class="action-card danger">
+            <div class="card-icon">🗑️</div>
+            <div class="card-content">
+                <h3>Hisobni O'chirish</h3>
+                <p>Hisobingizni butunlay o'chirish</p>
+            </div>
+        </a>
+    </div>
+</div>
+
+<style>
+    .profile-container {
+        padding: 30px;
+        max-width: 1000px;
+        margin: 0 auto;
+    }
+
+    .page-header {
+        margin-bottom: 30px;
+    }
+
+    .page-header h1 {
+        color: #333;
+        font-size: 36px;
+        margin-bottom: 10px;
+    }
+
+    .page-header p {
+        color: #666;
+        font-size: 18px;
+    }
+
+    .alert {
+        padding: 15px 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        font-weight: 500;
+    }
+
+    .alert-success {
+        background: #d4edda;
+        border: 2px solid #c3e6cb;
+        color: #155724;
+    }
+
+    .alert-danger {
+        background: #f8d7da;
+        border: 2px solid #f5c6cb;
+        color: #721c24;
+    }
+
+    .profile-card {
+        background: white;
+        padding: 40px;
+        border-radius: 15px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        margin-bottom: 30px;
+    }
+
+    .profile-avatar {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    .avatar-circle {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 48px;
+        font-weight: bold;
+        margin: 0 auto 15px;
+        box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+    }
+
+    .role-badge {
+        display: inline-block;
+        padding: 8px 20px;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 14px;
+    }
+
+    .role-badge.admin {
+        background: #ffc107;
+        color: #333;
+    }
+
+    .role-badge.user {
+        background: #17a2b8;
+        color: white;
+    }
+
+    .profile-info {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .info-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 15px;
+        background: #f8f9fa;
+        border-radius: 8px;
+        align-items: center;
+    }
+
+    .info-row .label {
+        font-weight: 600;
+        color: #666;
+        font-size: 14px;
+    }
+
+    .info-row .value {
+        color: #333;
+        font-size: 16px;
+        font-weight: 500;
+    }
+
+    .badge {
+        display: inline-block;
+        padding: 5px 12px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .badge-success {
+        background: #28a745;
+        color: white;
+    }
+
+    .badge-danger {
+        background: #dc3545;
+        color: white;
+    }
+
+    .badge-warning {
+        background: #ffc107;
+        color: #333;
+    }
+
+    .text-muted {
+        color: #999;
+        font-style: italic;
+    }
+
+    .action-cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 20px;
+    }
+
+    .action-card {
+        background: white;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        text-decoration: none;
+        display: flex;
+        gap: 20px;
+        align-items: center;
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+    }
+
+    .action-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    }
+
+    .action-card.primary:hover {
+        border-color: #667eea;
+    }
+
+    .action-card.warning:hover {
+        border-color: #ffc107;
+    }
+
+    .action-card.danger:hover {
+        border-color: #dc3545;
+    }
+
+    .card-icon {
+        font-size: 48px;
+    }
+
+    .card-content h3 {
+        color: #333;
+        font-size: 18px;
+        margin-bottom: 8px;
+    }
+
+    .card-content p {
+        color: #666;
+        font-size: 14px;
+        margin: 0;
+    }
+
+    @@media (max-width: 768px) {
+        .action-cards {
+            grid-template-columns: 1fr;
+        }
+
+        .info-row {
+            flex-direction: column;
+            gap: 8px;
+            text-align: center;
+        }
+    }
+</style>

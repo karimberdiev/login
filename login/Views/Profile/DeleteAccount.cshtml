@@ -1,0 +1,416 @@
+﻿@{
+    ViewData["Title"] = "Hisobni O'chirish";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="delete-account-container">
+    <div class="page-header danger">
+        <h1>🗑️ Hisobni O'chirish</h1>
+        <p>Diqqat! Bu harakat qaytarib bo'lmaydi</p>
+    </div>
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">
+            ❌ @TempData["ErrorMessage"]
+        </div>
+    }
+
+    <div class="warning-card">
+        <div class="warning-icon">⚠️</div>
+        <h2>DIQQAT!</h2>
+        <p>Hisobingizni o'chirish QAYTARIB BO'LMAYDIGAN harakat!</p>
+    </div>
+
+    <div class="consequences-card">
+        <h3>❗ Nimalar O'chiriladi:</h3>
+        <ul class="consequences-list">
+            <li>
+                <span class="icon">👤</span>
+                <span>Barcha shaxsiy ma'lumotlaringiz</span>
+            </li>
+            <li>
+                <span class="icon">📧</span>
+                <span>Email va username</span>
+            </li>
+            <li>
+                <span class="icon">🔑</span>
+                <span>Barcha login sessiyalaringiz</span>
+            </li>
+            <li>
+                <span class="icon">📊</span>
+                <span>Foydalanuvchi tarixi</span>
+            </li>
+            <li>
+                <span class="icon">🔒</span>
+                <span>Kirish huquqlaringiz</span>
+            </li>
+        </ul>
+    </div>
+
+    <div class="alternatives-card">
+        <h3>💡 Alternativalar</h3>
+        <p>Hisobni o'chirishdan oldin quyidagi variantlarni ko'rib chiqing:</p>
+        <div class="alternatives-grid">
+            <div class="alternative-item">
+                <span class="alt-icon">🔒</span>
+                <h4>Parolni O'zgartirish</h4>
+                <p>Agar xavfsizlik tashvishingiz bo'lsa</p>
+                <a asp-action="ChangePassword" class="btn btn-sm btn-info">O'zgartirish</a>
+            </div>
+            <div class="alternative-item">
+                <span class="alt-icon">📧</span>
+                <h4>Email Yangilash</h4>
+                <p>Agar email o'zgardi</p>
+                <a asp-action="Edit" class="btn btn-sm btn-info">Yangilash</a>
+            </div>
+            <div class="alternative-item">
+                <span class="alt-icon">🏠</span>
+                <h4>Profilga Qaytish</h4>
+                <p>Fikringizni o'zgartirdingiz</p>
+                <a asp-action="Index" class="btn btn-sm btn-success">Qaytish</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="delete-form-card">
+        <h3>🔐 Tasdiqlash</h3>
+        <p>Davom etish uchun parolingizni kiriting:</p>
+
+        <form asp-action="DeleteAccountConfirmed" asp-controller="Profile" method="post"
+              onsubmit="return confirm('Rostdan ham hisobingizni o\'chirmoqchimisiz? Bu harakat qaytarib bo\'lmaydi!');">
+            @Html.AntiForgeryToken()
+
+            <div class="form-group">
+                <label for="password">
+                    <span class="icon">🔑</span> Parolingiz
+                </label>
+                <input type="password"
+                       name="password"
+                       id="password"
+                       class="form-control"
+                       placeholder="Parolni kiriting"
+                       required
+                       autofocus />
+            </div>
+
+            <div class="final-warning">
+                <input type="checkbox" id="confirm-delete" required />
+                <label for="confirm-delete">
+                    Men hisobimni butunlay o'chirishni va bu harakatni qaytarib bo'lmasligini tushunaman
+                </label>
+            </div>
+
+            <div class="button-group">
+                <button type="submit" class="btn btn-danger">
+                    🗑️ Ha, Hisobni O'chirish
+                </button>
+                <a asp-action="Index" class="btn btn-secondary">
+                    ← Yo'q, Qaytish
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    .delete-account-container {
+        padding: 30px;
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    .page-header {
+        margin-bottom: 30px;
+        text-align: center;
+    }
+
+    .page-header.danger h1 {
+        color: #dc3545;
+        font-size: 36px;
+        margin-bottom: 10px;
+    }
+
+    .page-header p {
+        color: #666;
+        font-size: 18px;
+        font-weight: 600;
+    }
+
+    .alert-danger {
+        background: #f8d7da;
+        border: 2px solid #f5c6cb;
+        color: #721c24;
+        padding: 15px 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+    }
+
+    .warning-card {
+        background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+        color: white;
+        padding: 40px;
+        border-radius: 15px;
+        text-align: center;
+        margin-bottom: 20px;
+        box-shadow: 0 10px 30px rgba(255, 107, 107, 0.3);
+    }
+
+    .warning-icon {
+        font-size: 80px;
+        margin-bottom: 20px;
+        animation: pulse 2s infinite;
+    }
+
+    @@keyframes pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+    }
+
+    .warning-card h2 {
+        font-size: 32px;
+        margin-bottom: 15px;
+    }
+
+    .warning-card p {
+        font-size: 18px;
+        margin: 0;
+    }
+
+    .consequences-card {
+        background: white;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+    }
+
+    .consequences-card h3 {
+        color: #dc3545;
+        font-size: 22px;
+        margin-bottom: 20px;
+    }
+
+    .consequences-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .consequences-list li {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 15px;
+        background: #f8f9fa;
+        border-radius: 8px;
+        margin-bottom: 10px;
+        border-left: 4px solid #dc3545;
+    }
+
+    .consequences-list .icon {
+        font-size: 24px;
+    }
+
+    .consequences-list span:last-child {
+        color: #333;
+        font-size: 16px;
+    }
+
+    .alternatives-card {
+        background: white;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+    }
+
+    .alternatives-card h3 {
+        color: #17a2b8;
+        font-size: 22px;
+        margin-bottom: 15px;
+    }
+
+    .alternatives-card > p {
+        color: #666;
+        margin-bottom: 20px;
+    }
+
+    .alternatives-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+    }
+
+    .alternative-item {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 10px;
+        text-align: center;
+    }
+
+    .alt-icon {
+        font-size: 40px;
+        display: block;
+        margin-bottom: 10px;
+    }
+
+    .alternative-item h4 {
+        color: #333;
+        font-size: 16px;
+        margin-bottom: 8px;
+    }
+
+    .alternative-item p {
+        color: #666;
+        font-size: 13px;
+        margin-bottom: 15px;
+    }
+
+    .delete-form-card {
+        background: white;
+        padding: 40px;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        border: 2px solid #dc3545;
+    }
+
+    .delete-form-card h3 {
+        color: #333;
+        font-size: 22px;
+        margin-bottom: 10px;
+    }
+
+    .delete-form-card > p {
+        color: #666;
+        margin-bottom: 25px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-group label {
+        display: block;
+        color: #333;
+        font-weight: 600;
+        margin-bottom: 10px;
+        font-size: 14px;
+    }
+
+    .form-group label .icon {
+        font-size: 18px;
+        margin-right: 5px;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 12px 15px;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: 14px;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: #dc3545;
+        box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.1);
+    }
+
+    .final-warning {
+        background: #fff3cd;
+        border: 2px solid #ffc107;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 25px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .final-warning input[type="checkbox"] {
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
+    }
+
+    .final-warning label {
+        color: #856404;
+        font-size: 14px;
+        cursor: pointer;
+        margin: 0;
+    }
+
+    .button-group {
+        display: flex;
+        gap: 15px;
+    }
+
+    .btn {
+        padding: 12px 30px;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.3s ease;
+    }
+
+    .btn-danger {
+        background: #dc3545;
+        color: white;
+    }
+
+    .btn-danger:hover {
+        background: #c82333;
+        transform: translateY(-2px);
+    }
+
+    .btn-secondary {
+        background: #6c757d;
+        color: white;
+    }
+
+    .btn-secondary:hover {
+        background: #5a6268;
+    }
+
+    .btn-sm {
+        padding: 8px 15px;
+        font-size: 14px;
+    }
+
+    .btn-info {
+        background: #17a2b8;
+        color: white;
+    }
+
+    .btn-info:hover {
+        background: #138496;
+    }
+
+    .btn-success {
+        background: #28a745;
+        color: white;
+    }
+
+    .btn-success:hover {
+        background: #218838;
+    }
+
+    @@media (max-width: 768px) {
+        .alternatives-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .button-group {
+            flex-direction: column;
+        }
+
+        .btn {
+            width: 100%;
+        }
+    }
+</style>
