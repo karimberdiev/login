@@ -1,0 +1,349 @@
+﻿@model List<login.Models.User>
+@{
+    ViewData["Title"] = "Foydalanuvchilar";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="users-management">
+    <div class="page-header">
+        <h1>👥 Foydalanuvchilarni Boshqarish</h1>
+        <p>Barcha ro'yxatdan o'tgan foydalanuvchilar</p>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">
+            ✅ @TempData["SuccessMessage"]
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">
+            ❌ @TempData["ErrorMessage"]
+        </div>
+    }
+
+    <div class="table-container">
+        <table class="users-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Status</th>
+                    <th>Ro'yxatdan O'tgan</th>
+                    <th>Oxirgi Kirish</th>
+                    <th>Harakatlar</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var user in Model)
+                {
+                    <tr class="@(user.IsActive ? "" : "inactive-user")">
+                        <td>@user.Id</td>
+                        <td>
+                            <strong>@user.Username</strong>
+                            @if (user.Username == User.Identity?.Name)
+                            {
+                                <span class="badge badge-primary">Siz</span>
+                            }
+                        </td>
+                        <td>@user.Email</td>
+                        <td>
+                            @if (user.Role == "Admin")
+                            {
+                                <span class="badge badge-warning">👑 Admin</span>
+                            }
+                            else
+                            {
+                                <span class="badge badge-info">👤 User</span>
+                            }
+                        </td>
+                        <td>
+                            @if (user.IsActive)
+                            {
+                                <span class="badge badge-success">✅ Faol</span>
+                            }
+                            else
+                            {
+                                <span class="badge badge-danger">❌ Bloklangan</span>
+                            }
+                        </td>
+                        <td>@user.CreatedAt.ToString("dd.MM.yyyy HH:mm")</td>
+                        <td>
+                            @if (user.LastLoginAt.HasValue)
+                            {
+                                @user.LastLoginAt.Value.ToString("dd.MM.yyyy HH:mm")
+                            }
+                            else
+                            {
+                                <span class="text-muted">Hech qachon</span>
+                            }
+                        </td>
+                        <td>
+                            <div class="action-buttons">
+                                <!-- Toggle Status -->
+                                <form asp-action="ToggleStatus" method="post" style="display: inline;">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@user.Id" />
+                                    <button type="submit"
+                                            class="btn btn-sm @(user.IsActive ? "btn-warning" : "btn-success")"
+                                    @(user.Username == User.Identity?.Name ? "disabled" : "")>
+                                        @(user.IsActive ? "🚫 Block" : "✅ Aktivlashtirish")
+                                    </button>
+                                </form>
+
+                                <!-- Change Role -->
+                                @if (user.Username != User.Identity?.Name)
+                                {
+                                    <form asp-action="ChangeRole" method="post" style="display: inline;">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@user.Id" />
+                                        <input type="hidden" name="newRole" value="@(user.Role == "Admin" ? "User" : "Admin")" />
+                                        <button type="submit" class="btn btn-sm btn-primary">
+                                            @(user.Role == "Admin" ? "👤 Userga" : "👑 Adminga")
+                                        </button>
+                                    </form>
+
+                                    <!-- Delete User -->
+                                    <form asp-action="DeleteUser" method="post"
+                                          style="display: inline;"
+                                          onsubmit="return confirm('Rostdan ham @user.Username ni o\'chirmoqchimisiz?');">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@user.Id" />
+                                        <button type="submit" class="btn btn-sm btn-danger">
+                                            🗑️ O'chirish
+                                        </button>
+                                    </form>
+                                }
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        @if (Model.Count == 0)
+        {
+            <div class="no-data">
+                <p>Hech qanday foydalanuvchi topilmadi</p>
+            </div>
+        }
+    </div>
+
+    <div class="back-button">
+        <a asp-action="Dashboard" asp-controller="Admin" class="btn btn-secondary">
+            ← Admin Dashboard ga qaytish
+        </a>
+    </div>
+</div>
+
+<style>
+    .users-management {
+        padding: 30px;
+        max-width: 1600px;
+        margin: 0 auto;
+    }
+
+    .page-header {
+        margin-bottom: 30px;
+    }
+
+        .page-header h1 {
+            color: #333;
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+
+        .page-header p {
+            color: #666;
+            font-size: 18px;
+        }
+
+    .alert {
+        padding: 15px 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        font-weight: 500;
+    }
+
+    .alert-success {
+        background: #d4edda;
+        border: 2px solid #c3e6cb;
+        color: #155724;
+    }
+
+    .alert-danger {
+        background: #f8d7da;
+        border: 2px solid #f5c6cb;
+        color: #721c24;
+    }
+
+    .table-container {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        margin-bottom: 20px;
+    }
+
+    .users-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+        .users-table thead {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .users-table th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .users-table td {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            font-size: 14px;
+        }
+
+        .users-table tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+    .inactive-user {
+        opacity: 0.6;
+        background: #f5f5f5 !important;
+    }
+
+    .badge {
+        display: inline-block;
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .badge-primary {
+        background: #667eea;
+        color: white;
+    }
+
+    .badge-warning {
+        background: #ffc107;
+        color: #333;
+    }
+
+    .badge-info {
+        background: #17a2b8;
+        color: white;
+    }
+
+    .badge-success {
+        background: #28a745;
+        color: white;
+    }
+
+    .badge-danger {
+        background: #dc3545;
+        color: white;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 5px;
+        flex-wrap: wrap;
+    }
+
+    .btn {
+        padding: 8px 15px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 13px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-block;
+    }
+
+    .btn-sm {
+        padding: 5px 10px;
+        font-size: 12px;
+    }
+
+    .btn-primary {
+        background: #667eea;
+        color: white;
+    }
+
+        .btn-primary:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+        }
+
+    .btn-success {
+        background: #28a745;
+        color: white;
+    }
+
+        .btn-success:hover {
+            background: #218838;
+            transform: translateY(-2px);
+        }
+
+    .btn-warning {
+        background: #ffc107;
+        color: #333;
+    }
+
+        .btn-warning:hover {
+            background: #e0a800;
+            transform: translateY(-2px);
+        }
+
+    .btn-danger {
+        background: #dc3545;
+        color: white;
+    }
+
+        .btn-danger:hover {
+            background: #c82333;
+            transform: translateY(-2px);
+        }
+
+    .btn-secondary {
+        background: #6c757d;
+        color: white;
+    }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+    .btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    .text-muted {
+        color: #999;
+        font-style: italic;
+    }
+
+    .no-data {
+        text-align: center;
+        padding: 60px 20px;
+        color: #999;
+        font-size: 18px;
+    }
+
+    .back-button {
+        margin-top: 20px;
+    }
+</style>

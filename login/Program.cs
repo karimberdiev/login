@@ -42,7 +42,10 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     });
 
 builder.Services.AddAuthorization();
-
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.AccessDeniedPath = "/Auth/AccessDenied";
+});
 var app = builder.Build();
 
 if (!app.Environment.IsDevelopment())

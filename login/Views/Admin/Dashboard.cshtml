@@ -1,0 +1,207 @@
+﻿@{
+    ViewData["Title"] = "Admin Dashboard";
+
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="admin-dashboard">
+    <div class="page-header">
+        <h1>📊 Admin Dashboard</h1>
+        <p>Tizim statistikasi va boshqaruv</p>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="stats-grid">
+        <div class="stat-card primary">
+            <div class="stat-icon">👥</div>
+            <div class="stat-info">
+                <h3>@ViewBag.TotalUsers</h3>
+                <p>Jami Foydalanuvchilar</p>
+            </div>
+        </div>
+
+        <div class="stat-card success">
+            <div class="stat-icon">✅</div>
+            <div class="stat-info">
+                <h3>@ViewBag.ActiveUsers</h3>
+                <p>Faol Foydalanuvchilar</p>
+            </div>
+        </div>
+
+        <div class="stat-card warning">
+            <div class="stat-icon">👑</div>
+            <div class="stat-info">
+                <h3>@ViewBag.AdminCount</h3>
+                <p>Adminlar</p>
+            </div>
+        </div>
+
+        <div class="stat-card info">
+            <div class="stat-icon">👤</div>
+            <div class="stat-info">
+                <h3>@ViewBag.UserCount</h3>
+                <p>Oddiy Userlar</p>
+            </div>
+        </div>
+
+        <div class="stat-card danger">
+            <div class="stat-icon">📅</div>
+            <div class="stat-info">
+                <h3>@ViewBag.TodayRegistrations</h3>
+                <p>Bugungi Ro'yxatlar</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="quick-actions">
+        <h2>Tezkor Harakatlar</h2>
+        <div class="action-buttons">
+            <a asp-action="Users" asp-controller="Admin" class="action-btn primary">
+                <span class="icon">👥</span>
+                <span class="text">Foydalanuvchilarni Boshqarish</span>
+            </a>
+            <a asp-action="Dashboard" asp-controller="Home" class="action-btn success">
+                <span class="icon">🏠</span>
+                <span class="text">Asosiy Sahifa</span>
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+    .admin-dashboard {
+        padding: 30px;
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+    .page-header {
+        margin-bottom: 30px;
+    }
+
+    .page-header h1 {
+        color: #333;
+        font-size: 36px;
+        margin-bottom: 10px;
+    }
+
+    .page-header p {
+        color: #666;
+        font-size: 18px;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+        margin-bottom: 40px;
+    }
+
+    .stat-card {
+        background: white;
+        padding: 25px;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        transition: transform 0.3s ease;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .stat-icon {
+        font-size: 48px;
+        width: 70px;
+        height: 70px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 12px;
+        background: rgba(102, 126, 234, 0.1);
+    }
+
+    .stat-card.success .stat-icon {
+        background: rgba(76, 175, 80, 0.1);
+    }
+
+    .stat-card.warning .stat-icon {
+        background: rgba(255, 193, 7, 0.1);
+    }
+
+    .stat-card.info .stat-icon {
+        background: rgba(33, 150, 243, 0.1);
+    }
+
+    .stat-card.danger .stat-icon {
+        background: rgba(244, 67, 54, 0.1);
+    }
+
+    .stat-info h3 {
+        font-size: 32px;
+        color: #333;
+        margin: 0 0 5px 0;
+    }
+
+    .stat-info p {
+        font-size: 14px;
+        color: #666;
+        margin: 0;
+    }
+
+    .quick-actions {
+        background: white;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .quick-actions h2 {
+        color: #333;
+        font-size: 24px;
+        margin-bottom: 20px;
+    }
+
+    .action-buttons {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 15px;
+    }
+
+    .action-btn {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 20px;
+        border-radius: 10px;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+
+    .action-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+    }
+
+    .action-btn .icon {
+        font-size: 28px;
+    }
+
+    .action-btn .text {
+        font-size: 16px;
+        font-weight: 600;
+    }
+
+    .action-btn.success {
+        background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+    }
+
+    .action-btn.success:hover {
+        box-shadow: 0 8px 20px rgba(76, 175, 80, 0.3);
+    }
+</style>
