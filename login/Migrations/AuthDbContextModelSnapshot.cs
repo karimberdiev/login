@@ -22,6 +22,40 @@ namespace login.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("login.Models.EmailVerificationToken", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("VerifiedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Token");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("EmailVerificationTokens");
+                });
+
             modelBuilder.Entity("login.Models.Refreshtoken", b =>
                 {
                     b.Property<int>("Id")
@@ -37,7 +71,8 @@ namespace login.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("ReplacedByToken")
-                        .HasColumnType("text");
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
 
                     b.Property<DateTime?>("RevokedAt")
                         .HasColumnType("timestamp with time zone");
@@ -88,8 +123,8 @@ namespace login.Migrations
 
                     b.Property<string>("PasswordHash")
                         .IsRequired()
-                        .HasMaxLength(256)
-                        .HasColumnType("character varying(256)");
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
 
                     b.Property<string>("Role")
                         .IsRequired()
@@ -117,14 +152,25 @@ namespace login.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2026, 1, 18, 16, 38, 39, 166, DateTimeKind.Utc).AddTicks(5538),
-                            Email = "Admin@gmail.com",
+                            CreatedAt = new DateTime(2026, 1, 31, 14, 25, 57, 579, DateTimeKind.Utc).AddTicks(9923),
+                            Email = "admin@example.com",
                             IsActive = true,
                             IsEmailConfirmed = true,
-                            PasswordHash = "$2a$11$Ob8.MTiiJHRAFptOZ3rmQeY2c3Er8ogJLEu6BYNYgiZWSc2GUW7mS",
+                            PasswordHash = "$2a$11$kL9r2SZIGzxgttrEGqeHq.rG8fr7cBuu3v6BVfO9axM1HBbqF/oaW",
                             Role = "Admin",
                             Username = "admin"
                         });
+                });
+
+            modelBuilder.Entity("login.Models.EmailVerificationToken", b =>
+                {
+                    b.HasOne("login.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("login.Models.Refreshtoken", b =>
