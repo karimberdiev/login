@@ -1,0 +1,240 @@
+﻿@{
+    ViewData["Title"] = "Email Tasdiqlashni Qayta Yuborish";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            color: #333;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 16px;
+        }
+
+        .alert {
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            border: 2px solid #c3e6cb;
+            color: #155724;
+        }
+
+        .alert-danger {
+            background: #f8d7da;
+            border: 2px solid #f5c6cb;
+            color: #721c24;
+        }
+
+        .alert-warning {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            color: #856404;
+        }
+
+        .alert-info {
+            background: #d1ecf1;
+            border: 2px solid #bee5eb;
+            color: #0c5460;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .login-link {
+            text-align: center;
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            color: #666;
+        }
+
+        .login-link a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .info-box {
+            background: #e7f3ff;
+            border: 2px solid #bee5eb;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .info-box h3 {
+            color: #004085;
+            margin-bottom: 10px;
+        }
+
+        .info-box ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+
+        .info-box li {
+            color: #004085;
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="icon">📧</div>
+            <h1>Email Tasdiqlashni Qayta Yuborish</h1>
+            <p>Tasdiqlash emailini olmadingizmi? Yangi link oling!</p>
+        </div>
+
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success">
+                ✅ @TempData["SuccessMessage"]
+            </div>
+        }
+
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert alert-danger">
+                ❌ @TempData["ErrorMessage"]
+            </div>
+        }
+
+        @if (TempData["WarningMessage"] != null)
+        {
+            <div class="alert alert-warning">
+                ⚠️ @TempData["WarningMessage"]
+            </div>
+        }
+
+        @if (TempData["InfoMessage"] != null)
+        {
+            <div class="alert alert-info">
+                ℹ️ @TempData["InfoMessage"]
+            </div>
+        }
+
+        <form asp-action="ResendVerification" asp-controller="Auth" method="post">
+            @Html.AntiForgeryToken()
+
+            <div class="form-group">
+                <label for="email">📧 Email Manzilingiz</label>
+                <input type="email"
+                       name="email"
+                       id="email"
+                       value="@ViewBag.Email"
+                       placeholder="Email manzilingizni kiriting"
+                       required
+                       autofocus />
+            </div>
+
+            <button type="submit" class="btn">
+                📤 Tasdiqlash Linkini Qayta Yuborish
+            </button>
+        </form>
+
+        <div class="login-link">
+            <p>Email tasdiqlandi? <a asp-action="Login" asp-controller="Auth">Login qilish</a></p>
+        </div>
+
+        <div class="info-box">
+            <h3>📋 Ma'lumot</h3>
+            <ul>
+                <li>Tasdiqlash linki 24 soat amal qiladi</li>
+                <li>Spam papkani tekshiring</li>
+                <li>Email bir necha daqiqada kelishi mumkin</li>
+                <li>Agar email kelmasa, qayta yuborishni sinab ko'ring</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>
